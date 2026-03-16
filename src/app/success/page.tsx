@@ -1,24 +1,30 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-
 function SuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
+  const [origin, setOrigin] = useState("");
 
   const code = searchParams.get("code") ?? "";
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
+
   const shortUrl = useMemo(() => {
-    if (!code) return "";
-    return `${baseUrl.replace(/\/+$/, "")}/${code}`;
-  }, [code]);
+    if (!code || !origin) return "";
+    return `${origin.replace(/\/+$/, "")}/${code}`;
+  }, [code, origin]);
 
   if (!code) {
     router.replace("/");
