@@ -116,7 +116,7 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="shortCode">Short URL (opsional)</Label>
+            <Label htmlFor="shortCode">Short URL</Label>
             <p className="md:text-xs text-[10px] text-[#847353]">
               Leave it blank to generate a random short URL.
             </p>
