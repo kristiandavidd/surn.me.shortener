@@ -1,65 +1,144 @@
+import { redirect } from "next/navigation";
+import { findLinkByCode, insertLink } from "@/lib/db";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-export default function Home() {
+type HomeProps = {
+  searchParams?: Promise<{
+    error?: string;
+  }>;
+};
+
+async function generateUniqueCode() {
+  const alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (let i = 0; i < 5; i++) {
+    const candidate = Array.from({ length: 6 })
+      .map(() => alphabet[Math.floor(Math.random() * alphabet.length)] ?? "a")
+      .join("");
+
+    const exists = await findLinkByCode(candidate);
+
+    if (!exists) {
+      return candidate;
+    }
+  }
+
+  throw new Error("Gagal membuat kode pendek unik");
+}
+
+async function createShortUrl(formData: FormData) {
+  "use server";
+
+  const rawLong = formData.get("longUrl");
+  const rawShort = formData.get("shortCode");
+
+  if (typeof rawLong !== "string" || rawLong.trim().length === 0) {
+    redirect("/?error=Long+URL+tidak+boleh+kosong");
+  }
+
+  let longUrl = rawLong.trim();
+
+  if (!/^https?:\/\//i.test(longUrl)) {
+    longUrl = `https://${longUrl}`;
+  }
+
+  let shortCode: string;
+
+  if (typeof rawShort === "string" && rawShort.trim().length > 0) {
+    const cleaned = rawShort
+      .trim()
+      .replace(/^https?:\/\//i, "")
+      .replace(/^at\.au\/?/i, "")
+      .replace(/[^a-zA-Z0-9_-]/g, "");
+
+    if (!cleaned) {
+      redirect("/?error=Short+URL+tidak+valid");
+    }
+
+    const exists = await findLinkByCode(cleaned);
+
+    if (exists) {
+      redirect("/?error=Short+URL+sudah+dipakai");
+    }
+
+    shortCode = cleaned;
+  } else {
+    shortCode = await generateUniqueCode();
+  }
+
+  await insertLink(shortCode, longUrl);
+
+  redirect(
+    `/success?code=${encodeURIComponent(shortCode)}&long=${encodeURIComponent(longUrl)}`
+  );
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const params = searchParams ? await searchParams : undefined;
+  const error = params?.error;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <Card className="w-full max-w-xl ">
+        <div className="mb-6 flex flex-col gap-1">
+          <span className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
+            <Image src="/logo.svg" alt="surn.me" width={100} height={100} />
+          </span>
+          <h1 className="text-2xl font-semibold text-primary font-georgia">
+            Shut The Damn Link — Shorten That Sh*t
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="md:text-xs text-[10px] text-[#847353]">
+            Just put your long annoying URL here. We&apos;ll handle it.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        {error ? (
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {decodeURIComponent(error)}
+          </div>
+        ) : null}
+
+        <form action={createShortUrl} className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="longUrl">Long URL</Label>
+            <Input
+              id="longUrl"
+              name="longUrl"
+              type="url"
+              required
+              placeholder="https://fkin-long-url.com/v/asdjassdadasdlkasd"
+              className="mt-2"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="shortCode">Short URL (opsional)</Label>
+            <p className="md:text-xs text-[10px] text-[#847353]">
+              Leave it blank to generate a random short URL.
+            </p>
+            <div className="flex items-center gap-1 mt-2">
+              <div className="rounded-l-md bg-primary px-3 py-2 text-sm text-white">
+                surn.me/
+              </div>
+              <Input
+                id="shortCode"
+                name="shortCode"
+                type="text"
+                placeholder="damn-short-link"
+                className="rounded-none rounded-r-md"
+              />
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full mt-4">
+            Get Short URL
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 }
