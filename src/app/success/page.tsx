@@ -42,16 +42,13 @@ function SuccessContent() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-xl">
+    <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-4">
+      <Card className="w-full max-w-xl p-6">
         <div className="mb-6 flex flex-col gap-1">
-          <span className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
-            <Image src="/logo.svg" alt="surn.me" width={100} height={100} />
-          </span>
           <h1 className="text-2xl font-semibold text-primary font-georgia">
             Your Link Has Been Generated!
           </h1>
-          <p className="md:text-xs text-[10px] text-[#847353]">
+          <p className="text-xs text-[#847353]">
             Now you can share this link with your friends!
           </p>
         </div>
@@ -61,11 +58,14 @@ function SuccessContent() {
             SHORT URL
           </p>
           <div className="flex items-center gap-2">
-            <div className="flex-1 rounded-md bg-[#F7F5E6] px-3 py-3 font-mono text-sm text-[#8F0810] whitespace-nowrap overflow-hidden text-ellipsis border border-[#DCC9A6]" title={shortUrl}>
+            <div
+              className="flex-1 rounded-md bg-[#F7F5E6] px-3 py-3 font-mono text-sm text-[#8F0810] whitespace-nowrap overflow-hidden text-ellipsis border border-[#DCC9A6]"
+              title={shortUrl}
+            >
               {shortUrl}
             </div>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleCopy}
               className={`h-[46px] px-6 cursor-pointer shrink-0 ${copied ? "bg-[#8F0810] text-white" : "bg-[#8F0810]/80 text-[#F7F5E6]"}`}
             >
@@ -75,12 +75,16 @@ function SuccessContent() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <Button asChild variant={"outline"} className="w-full h-12 text-base font-medium border border-[#8F0810] text-[#8F0810]">
+          <Button
+            asChild
+            variant={"outline"}
+            className="w-full h-12 text-base font-medium border border-[#8F0810] text-[#8F0810]"
+          >
             <a href={shortUrl} target="_blank" rel="noopener noreferrer">
               Buka Langsung
             </a>
           </Button>
-          
+
           <button
             type="button"
             onClick={() => router.push("/")}

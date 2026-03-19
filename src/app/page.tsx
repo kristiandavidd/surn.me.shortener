@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { getSession } from "@/lib/auth";
 
 type HomeProps = {
   searchParams?: Promise<{
@@ -32,6 +33,8 @@ async function generateUniqueCode() {
 
 async function createShortUrl(formData: FormData) {
   "use server";
+
+  const session = await getSession();
 
   const rawLong = formData.get("longUrl");
   const rawShort = formData.get("shortCode");
@@ -70,7 +73,7 @@ async function createShortUrl(formData: FormData) {
     shortCode = await generateUniqueCode();
   }
 
-  await insertLink(shortCode, longUrl);
+  await insertLink(shortCode, longUrl, session?.user?.id);
 
   redirect(
     `/success?code=${encodeURIComponent(shortCode)}&long=${encodeURIComponent(longUrl)}`
@@ -82,16 +85,13 @@ export default async function Home({ searchParams }: HomeProps) {
   const error = params?.error;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-xl ">
+    <div className="flex min-h-[calc(100vh-80px)] items-center justify-center px-4">
+      <Card className="w-full max-w-xl p-6">
         <div className="mb-6 flex flex-col gap-1">
-          <span className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
-            <Image src="/logo.svg" alt="surn.me" width={100} height={100} />
-          </span>
           <h1 className="text-2xl font-semibold text-primary font-georgia">
             Shut The Damn Link — Shorten That Sh*t
           </h1>
-          <p className="md:text-xs text-[10px] text-[#847353]">
+          <p className="text-xs text-[#847353]">
             Just put your long annoying URL here. We&apos;ll handle it.
           </p>
         </div>

@@ -1,20 +1,27 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
-import { createClient } from "@libsql/client";
 
-const libsql = createClient({
-  url: process.env.TURSO_DATABASE_URL!,
-  authToken: process.env.TURSO_AUTH_TOKEN!,
-});
+const prismaClientSingleton = () => {
+  const url = process.env.TURSO_DATABASE_URL;
+  const authToken = process.env.TURSO_AUTH_TOKEN;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const adapter = new PrismaLibSql(libsql as any);
+  if (!url) {
+    throw new Error("TURSO_DATABASE_URL is missing");
+  }
 
-const globalForPrisma = globalThis as unknown as {
-  prisma?: PrismaClient;
+  const adapter = new PrismaLibSql({
+    url,
+    authToken,
+  });
+
+  return new PrismaClient({ adapter });
 };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+const globalForPrisma = globalThis as {
+  prisma?: ReturnType<typeof prismaClientSingleton>;
+};
+
+export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
