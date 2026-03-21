@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
+import { ensureTable } from "@/lib/db";
+import { Toaster } from "@/components/ui/sonner";
+import { ToastHandler } from "@/components/ToastHandler";
+
+// Run table check
+ensureTable().catch(console.error);
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,10 +38,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased pt-20`}
+        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
       >
-        <Header />
         {children}
+        <Toaster
+          position="bottom-center"
+          expand={true}
+          richColors
+          theme="light"
+        />
+        <ToastHandler />
       </body>
     </html>
   );

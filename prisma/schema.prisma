@@ -19,6 +19,7 @@ model User {
   updatedAt DateTime @updatedAt
   sessions  Session[]
   links     Link[]
+  linkTrees LinkTree[]
 
   @@map("user")
 }
@@ -46,9 +47,37 @@ model Link {
   id        String   @id @default(cuid())
   shortCode String   @unique
   longUrl   String
+  title     String?
   createdAt DateTime @default(now())
   userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@map("link")
+}
+
+model LinkTree {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?
+  image       String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       LinkTreeItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("link_tree")
+}
+
+model LinkTreeItem {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  icon        String?
+  linkTreeId  String
+  linkTree    LinkTree @relation(fields: [linkTreeId], references: [id], onDelete: Cascade)
+  order       Int      @default(0)
+
+  @@map("link_tree_item")
 }

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { logout } from "@/app/actions/auth";
+import { IconLogout } from "@tabler/icons-react";
 
 export function LogoutButton() {
   return (
@@ -9,9 +10,9 @@ export function LogoutButton() {
       variant="outline"
       size="sm"
       onClick={() => logout()}
-      className="text-primary border-primary hover:bg-primary/5"
+      className="text-primary border-primary rounded-full  py-2 hover:bg-primary/5"
     >
-      Logout
+      <IconLogout className="w-4 h-4" />
     </Button>
   );
 }

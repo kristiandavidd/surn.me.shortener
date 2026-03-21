@@ -29,15 +29,17 @@
 }
 
 :root {
-  --background: #f9fafb;
+  --background: #fdfafb;
   --foreground: #111827;
   --primary: #8F3037;
+  --brown: #847353;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-brown: var(--brown);
   --color-input: #e5e7eb;
   --color-muted-foreground: #6b7280;
   --font-sans: var(--font-geist-sans);
@@ -51,4 +53,20 @@ body {
   color: var(--foreground);
   font-family: var(--font-poppins), -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #DCC9A6;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #847353;
+  }
 }

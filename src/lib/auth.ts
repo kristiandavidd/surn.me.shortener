@@ -3,10 +3,11 @@ import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 import { Resend } from "resend";
 import { nanoid } from "nanoid";
+import { cache } from "react";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function getSession() {
+export const getSession = cache(async () => {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get("session_id")?.value;
 
@@ -34,7 +35,7 @@ export async function getSession() {
   }
 
   return session;
-}
+});
 
 export async function createSession(userId: string) {
   const sessionId = nanoid(32);
