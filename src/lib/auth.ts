@@ -87,9 +87,39 @@ export async function sendVerificationEmail(email: string, name: string) {
   const verificationUrl = `${baseUrl}/api/verify?token=${token}`;
 
   await resend.emails.send({
-    from: process.env.EMAIL_FROM || "Auth <no-reply@notify.surn.me>",
+    from: process.env.EMAIL_FROM || "Surn.me <no-reply@notify.surn.me>",
     to: email,
-    subject: "Verify your email address",
-    html: `<p>Hi ${name},</p><p>Please verify your email address by clicking <a href="${verificationUrl}">here</a>.</p>`,
+    subject: "Verify your email address - Surn.me",
+    html: `
+      <div style="font-family: 'Georgia', serif; max-width: 600px; margin: 0 auto; padding: 40px; background-color: #F7F5E6; border: 1px solid #DCC9A6; border-radius: 40px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+          <h1 style="color: #7C2D12; font-size: 32px; margin-bottom: 10px;">Welcome to Surn.me</h1>
+          <p style="color: #7C2D12; opacity: 0.6; font-weight: 500;">Your minimalist link shortener & link tree</p>
+        </div>
+        
+        <div style="background-color: #ffffff; padding: 40px; border-radius: 32px; border: 1px solid #DCC9A6; box-shadow: 0 10px 15px -3px rgba(124, 45, 18, 0.05);">
+          <h2 style="color: #7C2D12; font-size: 24px; margin-bottom: 20px;">Hi ${name},</h2>
+          <p style="color: #7C2D12; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+            Thank you for joining Surn.me! We're excited to have you on board. To start shortening your links and building your personalized link tree, please verify your email address by clicking the button below:
+          </p>
+          
+          <div style="text-align: center; margin-bottom: 30px;">
+            <a href="${verificationUrl}" style="display: inline-block; background-color: #7C2D12; color: #F7F5E6; padding: 16px 40px; border-radius: 16px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 10px 15px -3px rgba(124, 45, 18, 0.2);">
+              Verify Email Address
+            </a>
+          </div>
+          
+          <p style="color: #7C2D12; opacity: 0.6; font-size: 14px; line-height: 1.5;">
+            If the button doesn't work, you can also copy and paste the following link into your browser:<br>
+            <a href="${verificationUrl}" style="color: #7C2D12; text-decoration: underline;">${verificationUrl}</a>
+          </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; color: #7C2D12; opacity: 0.5; font-size: 12px;">
+          <p>&copy; ${new Date().getFullYear()} Surn.me. All rights reserved.</p>
+          <p>If you didn't create an account, you can safely ignore this email.</p>
+        </div>
+      </div>
+    `,
   });
 }
