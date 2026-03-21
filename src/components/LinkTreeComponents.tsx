@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/purity */
 "use client";
 
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { IconTrash, IconPlus, IconExternalLink, IconCopy, IconCheck, IconChevronDown, IconPencil, IconX, IconPhoto } from "@tabler/icons-react";
+import { IconTrash, IconPlus, IconExternalLink, IconCopy, IconCheck, IconPencil, IconX, IconPhoto } from "@tabler/icons-react";
 import { IconPickerModal } from "./IconPicker";
 import { getIconByValue } from "@/lib/icons";
 import { cn } from "@/lib/utils";

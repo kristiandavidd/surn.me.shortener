@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { findLinkByCode, insertLink, getLinksByUserId, createLinkTree, addLinkTreeItem, getLinkTreesByUserId, updateLinkTree, getLinkTreeWithItems, updateLink } from "@/lib/db";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -182,24 +183,40 @@ export default async function Home({ searchParams }: HomeProps) {
 
   if (session) {
     return (
-      <DashboardClient 
-        links={links} 
-        trees={trees} 
-        error={error} 
-        success={success}
-        createShortUrl={createShortUrl}
-        handleCreateLinkTree={handleCreateLinkTree}
-        getTreeDetails={getTreeDetails}
-      />
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-[#DDDBCD] text-primary font-bold">
+            Loading Dashboard...
+          </div>
+        }
+      >
+        <DashboardClient
+          links={links}
+          trees={trees}
+          error={error}
+          success={success}
+          createShortUrl={createShortUrl}
+          handleCreateLinkTree={handleCreateLinkTree}
+          getTreeDetails={getTreeDetails}
+        />
+      </Suspense>
     );
   }
 
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-1 flex items-center justify-center px-4 py-12 md:py-20">
-        <DashboardGuestShortener createShortUrl={createShortUrl} />
+        <Suspense
+          fallback={
+            <div className="w-full max-w-2xl bg-[#F7F5E6] p-12 rounded-[40px] border border-[#DCC9A6] text-center text-primary font-bold">
+              Loading...
+            </div>
+          }
+        >
+          <DashboardGuestShortener createShortUrl={createShortUrl} />
+        </Suspense>
       </div>
-      
+
       {/* Landing Page Content for Guests */}
       <div className="bg-[#DDDBCD]/30 border-t border-[#DCC9A6]/30">
         <LandingContent />

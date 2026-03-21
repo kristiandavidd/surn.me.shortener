@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { register } from "@/app/actions/auth";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -11,7 +11,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
-export default function RegisterPage() {
+function RegisterContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -189,5 +189,13 @@ export default function RegisterPage() {
         )}
       </div>
     </motion.div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }

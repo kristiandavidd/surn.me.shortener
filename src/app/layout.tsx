@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { ensureTable } from "@/lib/db";
 import { Toaster } from "@/components/ui/sonner";
+import { Suspense } from "react";
 import { ToastHandler } from "@/components/ToastHandler";
 
 // Run table check
@@ -47,7 +48,9 @@ export default function RootLayout({
           richColors
           theme="light"
         />
-        <ToastHandler />
+        <Suspense fallback={null}>
+          <ToastHandler />
+        </Suspense>
       </body>
     </html>
   );
